@@ -1,0 +1,25 @@
+{
+  "name": "GetSSHS-backend",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/james0248/GetSSHS-backend.git",
+  "author": "Hyeonseok Jung",
+  "license": "MIT",
+  "dependencies": {
+    "bcrypt": "^4.0.1",
+    "dotenv": "^8.2.0",
+    "koa": "^2.11.0",
+    "koa-body": "^4.1.1",
+    "koa-router": "^8.0.8",
+    "koa-session": "^5.13.1",
+    "mongodb": "^3.5.4"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "start:dev": "nodemon src/index.js --watch"
+  },
+  "devDependencies": {
+    "kill-port": "^1.6.0",
+    "nodemon": "^2.0.2"
+  }
+}
