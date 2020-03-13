@@ -15,7 +15,7 @@ const PORT = process.env.PORT || 8000
 app.keys = [process.env.KEY]
 
 app.use(middleware);
-app.use(cors({ origin: "https://james0248.github.io/GetSSHS/" }))
+app.use(cors({ origin: "https://james0248.github.io/" }))
 app.use(session(app))
 app.use(api.routes())
 app.use(api.allowedMethods())
