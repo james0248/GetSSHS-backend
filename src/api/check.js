@@ -7,6 +7,7 @@ let clamp = (number, low, high) => {
 }
 
 module.exports = async (ctx, next) => {
+    const ranking = ctx.state.collection.ranking
     let game = new Game(4)
     const {
         name,
@@ -65,7 +66,6 @@ module.exports = async (ctx, next) => {
         ctx.error(400, 'exactly-same-game-exists')
     }
 
-    const ranking = ctx.state.collection.ranking
     const rank = await ranking.findOne({ name: name })
     if (rank === null || rank.score < score) {
         await ranking.findOneAndUpdate({ name: name }, {

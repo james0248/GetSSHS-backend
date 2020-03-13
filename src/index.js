@@ -3,7 +3,8 @@ const
     path = require('path'),
     Koa = require('koa'),
     middleware = require('./middleware'),
-    session = require('koa-session')
+    session = require('koa-session'),
+    cors = require('@koa/cors')
 
 dotenv.config({ path: path.resolve(__dirname, '../.env') })
 
@@ -14,6 +15,7 @@ const PORT = process.env.PORT || 8000
 app.keys = [process.env.KEY]
 
 app.use(middleware);
+app.use(cors())
 app.use(session(app))
 app.use(api.routes())
 app.use(api.allowedMethods())

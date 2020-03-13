@@ -101,6 +101,15 @@ class gameManager {
         if(Number.isNaN(dir) || !Number.isInteger(dir) || dir < 0 || dir > 3) {
             return false
         }
+        let prevTags = this.board.board.map(row => {
+            return row.map(tile => {
+                return {
+                    isMerged: tile.isMerged,
+                    isNew: tile.isNew,
+                }
+            })
+        })
+        this.clearBoardTags()
         let moveX = (dir === 2) ? -1 : 1
         let moveY = (dir === 3) ? -1 : 1
         for (let x = (dir === 2) ? 3 : 0; this.clamp(x); x += moveX) {
@@ -108,11 +117,23 @@ class gameManager {
                 let prev = { x: x, y: y }
                 let next = this.getMovedPosition(prev, dir)
                 if (!this.isPositionEqual(prev, next)) {
+                    this.restoreTags(prevTags)
                     return true
                 }
             }
         }
+        this.restoreTags(prevTags)
         return false
+    }
+
+    restoreTags(prevTags) {
+        this.board.board = this.board.board.map((row, x) => {
+            return row.map((tile, y) => {
+                tile.isMerged = prevTags[x][y].isMerged
+                tile.isNew = prevTags[x][y].isNew
+                return tile
+            })
+        })
     }
 
     isPositionEqual(prev, next) {
