@@ -54,8 +54,8 @@ module.exports = async (ctx, next) => {
         ctx.error(400, 'wrong-score')
     }
 
-    let inputSeqHashed = await bcrypt.hash(inputSeq.trim(), await bcrypt.genSalt(10))
-    let tileSeqHashed = await bcrypt.hash(tileSeq.toString().trim(), await bcrypt.genSalt(10))
+    let inputSeqHashed = await bcrypt.hash(inputSeq.trim(), process.env.SALT)
+    let tileSeqHashed = await bcrypt.hash(tileSeq.toString().trim(), process.env.SALT)
     let copy = await ranking.find({
         $or: [{
             inputSeqHashed: inputSeqHashed,
