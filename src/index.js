@@ -15,7 +15,6 @@ const PORT = process.env.PORT || 8000
 app.keys = [process.env.KEY]
 
 app.use(middleware);
-app.use(cors())
 app.use(session(app))
 app.use(api.routes())
 app.use(api.allowedMethods())
