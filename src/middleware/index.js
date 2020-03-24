@@ -15,7 +15,7 @@ const getDB = async (ctx, next) => {
     ctx.state.client = client
     ctx.state.db = client.db('GetSSHS')
     ctx.state.collection = {}
-    ctx.state.collection.ranking = ctx.state.db.collection('ranking')
+    ctx.state.collection.ranking = ctx.state.db.collection('event')
     await next()
 }
 
