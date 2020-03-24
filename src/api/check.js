@@ -90,6 +90,7 @@ module.exports = async (ctx, next) => {
             $set: {
                 name: name,
                 score: score,
+                date: new Date(),
                 inputSeqHashed: inputSeqHashed,
                 tileSeqHashed: tileSeqHashed
             }
