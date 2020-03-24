@@ -1,12 +1,20 @@
 const
     Game = require('../game/gameManager'),
-    bcrypt = require('bcrypt')
+    bcrypt = require('bcrypt'),
+    eventStart = new Date('Wed Mar 25 2020 12:00:00 GMT+0900'),
+    eventEnd = new Date('Wed Apr 01 2020 00:00:00 GMT+0900')
+
 
 let clamp = (number, low, high) => {
     return !(Number.isNaN(number) || !Number.isInteger(number) || number < low || number > high)
 }
 
 module.exports = async (ctx, next) => {
+    let now = Date.now()
+    if(now < eventStart || eventEnd < now) {
+        ctx.error(406, 'not-event-time')
+    }
+
     const ranking = ctx.state.collection.ranking
     let game = new Game(4)
     const {
@@ -24,25 +32,27 @@ module.exports = async (ctx, next) => {
         ctx.error(400, 'form-malformed')
     }
 
-    let isValid = true
     let inputs = inputSeq.split('').map(dir => {
-        isValid = isValid && clamp(parseInt(dir), 0, 3)
+        if(parseInt(dir) === NaN || !clamp(parseInt(dir), 0, 3)) {
+            ctx.error(400, 'form-malformed')
+        }
         return parseInt(dir)
     })
     tileSeq.forEach(tile => {
-        isValid = isValid && clamp(tile[0], 0, 15) && clamp(tile[1], 1, 2)
+        if(!Array.isArray(tile) || tile.length !== 2 || !clamp(tile[0], 0, 15) || !clamp(tile[1], 1, 2)) {
+            ctx.error(400, 'form-malformed')
+        }
     })
-    isValid = isValid && ((inputs.length + 2) === tileSeq.length)
-
-    if (!isValid) {
+    if((inputs.length + 2) !== tileSeq.length) {
         ctx.error(400, 'form-malformed')
     }
 
     game.board.fillEmptyTile(tileSeq[0][0], tileSeq[0][1])
     game.board.fillEmptyTile(tileSeq[1][0], tileSeq[1][1])
 
+    let res = null
     for (let i = 0; i < inputs.length; i++) {
-        let res = game.listen(inputs[i])
+        res = game.listen(inputs[i])
         if (!res.moved) {
             ctx.error(400, 'invalid-sequence')
         }
@@ -53,6 +63,13 @@ module.exports = async (ctx, next) => {
     if (score !== game.score) {
         ctx.error(400, 'wrong-score')
     }
+    let moveable = false
+    for (let i = 0; i < 4; i++) {
+        moveable = moveable || game.isMoveAvailable(i)
+    }
+    if(moveable) {
+        ctx.error(400, 'game-did-not-end')
+    }
 
     let inputSeqHashed = await bcrypt.hash(inputSeq.trim(), process.env.SALT)
     let tileSeqHashed = await bcrypt.hash(tileSeq.toString().trim(), process.env.SALT)
@@ -62,6 +79,7 @@ module.exports = async (ctx, next) => {
             tileSeqHashed: tileSeqHashed
         }]
     }).toArray()
+
     if (copy.length !== 0) {
         ctx.error(400, 'exactly-same-game-exists')
     }
