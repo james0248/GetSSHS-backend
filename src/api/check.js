@@ -1,7 +1,7 @@
 const
     Game = require('../game/gameManager'),
     bcrypt = require('bcrypt'),
-    eventStart = new Date('Wed Mar 24 2020 12:00:00 GMT+0900'),
+    eventStart = new Date('Wed Mar 25 2020 12:00:00 GMT+0900'),
     eventEnd = new Date('Wed Apr 01 2020 00:00:00 GMT+0900')
 
 
