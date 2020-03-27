@@ -84,6 +84,30 @@ module.exports = async (ctx, next) => {
         ctx.error(400, 'exactly-same-game-exists')
     }
 
+    let cnt = 0
+    tileSeq.forEach(tile => {
+        if(tile[1] === 2) {
+            cnt++
+        }
+    })
+    let ratio = cnt / tileSeq.length
+    if (score > 100000 && (ratio > 0.15 || ratio < 0.05)) {
+        console.log(`User ${name} showed attempt to jujak leaderboard with ratio ${ratio} and length ${tileSeq.length} cnt ${cnt}`)
+        await ctx.state.collection.jujak.findOneAndUpdate({ name: name }, {
+            $set: {
+                name: name,
+                score: score,
+                inputSeqHashed: inputSeqHashed,
+                tileSeqHashed: tileSeqHashed,
+                tileSeq: tileSeq,
+                inputSeq: inputSeq
+            }
+        }, { upsert: true })
+        ctx.response.body = 'success-but-jujak-suspected'
+        ctx.response.status = 200
+        return
+    }
+
     const rank = await ranking.findOne({ name: name })
     if (rank === null || rank.score < score) {
         await ranking.findOneAndUpdate({ name: name }, {
@@ -91,7 +115,9 @@ module.exports = async (ctx, next) => {
                 name: name,
                 score: score,
                 inputSeqHashed: inputSeqHashed,
-                tileSeqHashed: tileSeqHashed
+                tileSeqHashed: tileSeqHashed,
+                tileSeq: tileSeq,
+                inputSeq: inputSeq
             }
         }, { upsert: true })
     }
